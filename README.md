@@ -3,7 +3,7 @@
 ## To use
 
 Read the kernel-build.sh source file and give the proper paths and stuff and change whatever you require.
-Recommended you copy the all files and folders except '.git' folder to you kernel source directory.
+Recommended you copy the all files and folders except '.git' folder and README.md to you kernel source directory.
 After that 'cd' to kernel directory and make the scipt executable.
 
 
@@ -11,11 +11,11 @@ $ chmod a+xr kernel-build.sh
 
 $ ./kernel-build.sh
 
-Note : Rememeber to give the proper to your directories otherwise the build script will exit (fail safe I included, can be removed).
+Note : Rememeber to give the proper paths to your directories otherwise the build script will exit (fail safe I included, can be removed).
 
 ## Information :
 
-1.) kernel-build.sh : the build script in bash
+1.) kernel-build.sh : the build script uses bash.
 
 2.) lazyflasher : this is the lazyflasher flashable zip file craetion tool made by @jcadduono
 
@@ -23,7 +23,7 @@ Note : Rememeber to give the proper to your directories otherwise the build scri
 
 4.) out : the newly signed flashable zip is placed here.
 
-## Links
+## Useful Links
 
 lazyflasher : https://github.com/jcadduono/lazyflasher
 
