@@ -1,17 +1,18 @@
 # Android Kernel Building Script by sagar846
 
-## To use
+## How to use
 
 Read the kernel-build.sh source file and give the proper paths and stuff and change whatever you require.
 Recommended you copy the all files and folders except '.git' folder and README.md to you kernel source directory.
-After that 'cd' to kernel directory and make the scipt executable.
-
+After that cd to kernel directory and make the scipt executable.
 
 $ chmod a+xr kernel-build.sh
 
 $ ./kernel-build.sh
 
 Note : Rememeber to give the proper paths to your directories otherwise the build script will exit (fail safe I included, can be removed).
+
+Note : If your kernel requires other modules to be built then you will have to add the relevent code  which takes care of that.
 
 ## Information :
 
