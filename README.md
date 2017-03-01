@@ -6,11 +6,10 @@ Read the kernel-build.sh source file and give the proper paths and stuff and cha
 Recommended you copy the all files and folders except '.git' folder to you kernel source directory.
 After that 'cd' to kernel directory and make the scipt executable.
 
-'''
+
 $ chmod a+xr kernel-build.sh
 
 $ ./kernel-build.sh
-'''
 
 Note : Rememeber to give the proper to your directories otherwise the build script will exit (fail safe I included, can be removed).
 
