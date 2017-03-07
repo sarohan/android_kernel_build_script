@@ -1,23 +1,43 @@
 #!/bin/bash
-#
+
 # Android Kernel Build Script for Enigma Kernel by sagar846 @xda-developers
 # Can be modified for other devices easily.
 
 # This isn't licenced but you can freely edit and share without my permission
 # Just don't make it forget the original author, i.e , me.
-#
+
 # v1 : Initial release.
 #
 # v2 : Incorporate lazy flasher stuff + other modifications
 #
 # v3 : Some changes here and there + new stuff
 #
-# v4 : implement signing zip + some changes
+# v4 : Implement signing zip + some changes
+#
+# v5 : Add Colors Support
 
 # Just a side note : even if your kernel build fails and you don't make a clean build
-# The zip file will  be created nonetheless if a zImage exists that is.
+# The zip file will be created nonetheless if a zImage exists.
 
 clear
+
+# Global Delay funtion
+DELAY()
+{
+	sleep 1;
+}
+
+# Colors support
+export txtbld=$(tput bold)
+export txtrst=$(tput sgr0)
+export red=$(tput setaf 1)
+export grn=$(tput setaf 2)
+export blu=$(tput setaf 4)
+export cya=$(tput setaf 6)
+export bldred=${txtbld}$(tput setaf 1)
+export bldgrn=${txtbld}$(tput setaf 2)
+export bldblu=${txtbld}$(tput setaf 4)
+export bldcya=${txtbld}$(tput setaf 6)
 
 #Resources- Change according to your device and needs
 NAME="enigma"
@@ -25,10 +45,10 @@ KERNEL="kernel"
 VERSION="rX"
 DEVICE="athene"
 ZIP="$NAME-$KERNEL-$DEVICE-$VERSION"
-THREAD="-j4"
+export NRCPUS=`grep 'processor' /proc/cpuinfo | wc -l`;
 DEVICE="athene"
 DEVICE_NAME="Moto G4 Plus"
-DEFCONFIG="athene_defconfig"
+DEFCONFIG="enigma_defconfig"
 KERNEL="zImage"
 FLASHABLE_ZIP="*.zip"
 
@@ -36,7 +56,7 @@ FLASHABLE_ZIP="*.zip"
 export ARCH=arm
 # Give the complete path to your toolchain like so
 # ~/folder-containing-toolchain/name-of-toolchain-folder/bin/arm-eabi-
-export CROSS_COMPILE=~/toolchains/UBERTC-arm-eabi-4.9/bin/arm-eabi-
+export CROSS_COMPILE=~/toolchains/gcc-linaro-4.9-2016.02-x86_64_arm-linux-gnueabihf/bin/arm-linux-gnueabihf-
 
 #Paths - Very Important that you give the right paths
 KERNEL_DIR="${HOME}/kernel_athene"
@@ -49,6 +69,19 @@ SIGN_ZIP_DIR="$KERNEL_DIR/signzip"
 ############## Unless you know what you're doing ################
 
 #Functions
+function check_gcc
+{
+	echo "${bldcya}***** Checking for GCC...${txtrst}";
+	DELAY;
+	if [ ! -f ${CROSS_COMPILE}gcc ]; then
+		echo "${bldred}***** ERROR: Cannot find GCC!${txtrst}";
+		DELAY;
+		exit 1;
+	fi
+	echo "${bldgrn}***** Checked!${txtrst}";
+	DELAY;
+}
+
 function clean_out {
 	cd $KERNEL_OUT_DIR
 	echo
@@ -59,15 +92,23 @@ function clean_out {
 
 function clean_all {
 	cd $KERNEL_DIR
-	echo
-	make clean
+	echo "${bldcya}***** Cleaning up source...${txtrst}";
+	DELAY;
+	# Main cleaning
+	make clean;
+
+	echo "${bldgrn}***** Cleaned!${txtrst}";
+	DELAY;
 }
 
 function make_kernel {
 	cd $KERNEL_DIR
-	echo
-	make $DEFCONFIG
-	make $THREAD
+	make $DEFCONFIG;
+
+	echo "${bldcya}***** Building -> Kernel${txtrst}";
+	DELAY;
+
+	make -j$NRCPUS
 }
 
 function sign_zip {
@@ -80,13 +121,13 @@ function sign_zip {
 # The action starts here
 
 echo -e ">>>>> Kernel building script for Moto G4 Plus (athene)"
-echo -e ">>>>> Version 4, February 2017"
+echo -e ">>>>> Version 5, March 2017"
 echo -e ">>>>> Written by sagar846 @ github (https://github.com/sagar846/)"
 echo -e ">>>>> AKA sagar846 @ xda-developers"
 echo -e " "
 echo -e " "
 
-while read -p "Executing Kernel Build Script. Continue (y/N)? " achoice
+while read -p "${bldblu}Executing Kernel Build Script. Continue (y/N)? ${txtbld}" achoice
 do
 case "$achoice" in
 	y|Y)
@@ -95,7 +136,7 @@ case "$achoice" in
 		;;
 	n|N)
 		echo
-		echo "Exiting build script"
+		echo "${bldred}Exiting build script${txtrst}"
 		echo
 		exit
 		;;
@@ -107,7 +148,7 @@ case "$achoice" in
 esac
 done
 
-while read -p "Do you want to clean out directory (y/N)? " bchoice
+while read -p "${bldcya}Do you want to clean out directory (y/N)? ${txtrst}" bchoice
 do
 case "$bchoice" in
 	y|Y)
@@ -124,16 +165,18 @@ case "$bchoice" in
 		;;
 	* )
 		echo
-		echo "Invalid input try again!"
+		echo "${bldred}Invalid input try again!${txtrst}"
 		echo
 		;;
 esac
 done
 
-while read -p "Do you want to perform a clean build (y/N)? " cchoice
+while read -p "${bldcya}Do you want to perform a clean build (y/N)? ${txtrst}" cchoice
 do
 case "$cchoice" in
 	y|Y)
+		echo
+		check_gcc
 		echo
 		clean_all
 		echo "Cleansed your kernel's soul"
@@ -148,13 +191,13 @@ case "$cchoice" in
 		;;
 	* )
 		echo
-		echo "Invalid input try again!"
+		echo "${bldred}Invalid input try again!${txtrst}"
 		echo
 		;;
 esac
 done
 
-echo "You are building Enigma kernel for $DEVICE_NAME ($DEVICE)";
+echo "${bldgrn}You are building Enigma kernel for $DEVICE_NAME ($DEVICE)${txtrst}";
 echo
 
 while read -p "Do you want to build the kernel (y/N)? " dchoice
@@ -171,22 +214,33 @@ case "$dchoice" in
 			echo
 		else
 			echo
-			echo "Kernel Build failed"
+			echo "${bldred}Kernel Build failed${txtrst}"
 			echo "Try building kernel without this script and see what went wrong."
-			echo "Exiting script"
-			exit
+			echo 
+			echo "Do you want to run 'make' (y/N) ? " echoice
+			if [ $echoice == 'y' || $echoice == 'Y' ]
+			then
+					echo
+					make
+					echo
+		        else
+					echo
+					echo "Exiting build script"
+					exit
+					echo
+			fi
 			echo
 		fi
 		break
 		;;
 	n|N)
-		echo "Exiting build script"
+		echo "${bldred}Exiting build script${txtrst}"
 		echo
 		exit
 		;;
 	* )
 		echo
-		echo "Invalid input try again!"
+		echo "${bldred}Invalid input try again!${txtrst}"
 		echo
 		;;
 esac
@@ -196,7 +250,7 @@ done
 # have to change everything from here onwards with proper commands.
 # Remember Google is your friend though it can be a bitch sometimes.
 
-echo "Moving all necessary files to lazyflasher directory..."
+echo "${bldcya}Moving all necessary files to lazyflasher directory...${txtrst}"
 echo
 
 if [ -f $LAZYFLASHER_DIR/$KERNEL ];
@@ -244,7 +298,7 @@ then
 	echo
 else
 	echo
-	echo "Error: could not create zip file."
+	echo "${bldred}Error: could not create zip file${txtrst}"
 	echo "zImage does not exist in lazyflasher root directory"
 	echo "Fix compile errors and rerun script to compile the kernel again"
 	echo "Aborting script"
@@ -275,6 +329,6 @@ then
 	rm "$ZIP".zip
 fi
 
-echo "###### Script Execution Completed ######"
+echo "${bldblu}###### Script Execution Completed ######${txtrst}"
 echo
 
